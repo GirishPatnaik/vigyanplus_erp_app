@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<paths xmlns:android="http://schemas.android.com/apk/res/android">
+    <external-files-path name="student_photos" path="student_photos/" />
+    <external-files-path name="backups" path="backups/" />
+    <cache-path name="camera_cache" path="camera/" />
+</paths>

@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="vigyan_green">#1FAE38</color>
+    <color name="vigyan_green_dark">#0C7A22</color>
+    <color name="vigyan_magenta">#E8148C</color>
+    <color name="vigyan_cyan">#3AC7E0</color>
+    <color name="vigyan_orange">#F5941F</color>
+    <color name="vigyan_gold">#F2C41A</color>
+    <color name="surface_light">#FFFBFE</color>
+    <color name="launcher_bg">#FFFFFF</color>
+</resources>
