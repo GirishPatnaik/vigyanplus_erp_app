@@ -85,7 +85,7 @@ fun AppScaffold(
                 }
                 HorizontalDivider()
                 NavigationDrawerItem(
-                    icon = { Icon(Icons.AutoMirrored.Filled.Logout, contentDescription = "Logout") },
+                    icon = { Icon(Icons.Default.ExitToApp, contentDescription = "Logout") },
                     label = { Text("Logout") },
                     selected = false,
                     onClick = onLogout,
