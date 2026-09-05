@@ -26,6 +26,7 @@ import com.vigyan.juniorcollege.VigyanApp
 import com.vigyan.juniorcollege.ui.nav.Routes
 import com.vigyan.juniorcollege.util.simpleFactory
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun StudentProfileScreen(navController: NavController, studentId: Long) {
     val context = LocalContext.current
