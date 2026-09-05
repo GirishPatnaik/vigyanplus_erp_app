@@ -73,6 +73,7 @@ class ChangePasswordViewModel(
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ChangePasswordScreen(navController: NavController, userId: Long?) {
     val context = LocalContext.current
