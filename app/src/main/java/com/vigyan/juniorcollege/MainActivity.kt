@@ -39,7 +39,7 @@ class MainActivity : ComponentActivity() {
         setContent {
             VigyanErpTheme {
                 Surface(modifier = Modifier.fillMaxSize()) {
-                    VigyanApp()
+                    VigyanAppRoot()
                 }
             }
         }
@@ -47,7 +47,7 @@ class MainActivity : ComponentActivity() {
 }
 
 @Composable
-private fun VigyanApp() {
+private fun VigyanAppRoot() {
     val context = androidx.compose.ui.platform.LocalContext.current
     val app = context.applicationContext as com.vigyan.juniorcollege.VigyanApp
     val navController = rememberNavController()
