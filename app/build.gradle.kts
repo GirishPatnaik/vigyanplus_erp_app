@@ -7,10 +7,6 @@ plugins {
     id("com.google.devtools.ksp")
 }
 
-// Loads signing credentials from keystore.properties (git-ignored, project root).
-// If the file is missing — e.g. a fresh checkout without the keystore — release
-// builds simply won't be signed here; `gradlew assembleDebug` still works fine,
-// and CI/other devs can add their own keystore.properties from the template.
 val keystorePropertiesFile = rootProject.file("keystore.properties")
 val keystoreProperties = Properties()
 val hasSigningConfig = keystorePropertiesFile.exists()
@@ -26,10 +22,6 @@ android {
         applicationId = "com.vigyan.juniorcollege"
         minSdk = 24
         targetSdk = 34
-
-        // Versioning convention: bump versionCode by 1 on every release build
-        // submitted anywhere (internal testing, Play Store, direct APK share).
-        // versionName follows semantic-ish MAJOR.MINOR.PATCH for humans.
         versionCode = 1
         versionName = "1.0.0"
 
@@ -38,6 +30,12 @@ android {
     }
 
     signingConfigs {
+        create("debug") {
+            storeFile = rootProject.file("config/debug.keystore")
+            storePassword = "android"
+            keyAlias = "androiddebugkey"
+            keyPassword = "android"
+        }
         if (hasSigningConfig) {
             create("release") {
                 storeFile = file(keystoreProperties.getProperty("storeFile"))
@@ -53,6 +51,7 @@ android {
             applicationIdSuffix = ".debug"
             versionNameSuffix = "-debug"
             isDebuggable = true
+            signingConfig = signingConfigs.getByName("debug")
         }
         release {
             isMinifyEnabled = true
@@ -101,24 +100,14 @@ dependencies {
     implementation("androidx.compose.material3:material3")
     implementation("androidx.navigation:navigation-compose:2.7.7")
 
-    // Room
     implementation("androidx.room:room-runtime:2.6.1")
     implementation("androidx.room:room-ktx:2.6.1")
     ksp("androidx.room:room-compiler:2.6.1")
 
-    // Coil for image loading (student photos)
     implementation("io.coil-kt:coil-compose:2.6.0")
-
-    // CSV parsing
     implementation("com.opencsv:opencsv:5.9")
-
-    // Security (Aadhaar/PIN hashing helper - AndroidX security-crypto)
     implementation("androidx.security:security-crypto:1.1.0-alpha06")
-
-    // DataStore for session
     implementation("androidx.datastore:datastore-preferences:1.1.1")
-
-    // WorkManager for scheduled automatic backups
     implementation("androidx.work:work-runtime-ktx:2.9.1")
 
     testImplementation("junit:junit:4.13.2")
