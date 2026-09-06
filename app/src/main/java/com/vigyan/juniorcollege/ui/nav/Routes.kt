@@ -16,6 +16,7 @@ object Routes {
     const val CSV_IMPORT = "csv_import"
     const val RECYCLE_BIN = "recycle_bin"
     const val CHANGE_PASSWORD = "change_password"
+    const val CLOUD_SYNC = "cloud_sync"
 
     fun studentEdit(id: Long) = "student_edit/$id"
     fun studentProfile(id: Long) = "student_profile/$id"
