@@ -25,7 +25,7 @@ class VigyanApp : Application() {
     val attendanceRepository: AttendanceRepository by lazy { AttendanceRepository(database.attendanceDao()) }
     val masterRepository: MasterRepository by lazy { MasterRepository(database.masterDao()) }
     val csvRepository: CsvRepository by lazy {
-        CsvRepository(this, database.studentDao(), database.importHistoryDao())
+        CsvRepository(this, database.studentDao(), database.masterDao(), database.importHistoryDao())
     }
     val backupRepository: BackupRepository by lazy { BackupRepository(this) }
 
