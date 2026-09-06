@@ -42,4 +42,18 @@ interface AttendanceDao {
 
     @Delete
     suspend fun delete(entity: AttendanceEntity)
+
+    // --- Cloud sync support ---
+
+    @Query("SELECT * FROM attendance WHERE studentId = :studentId AND date = :date LIMIT 1")
+    suspend fun findByStudentAndDate(studentId: Long, date: String): AttendanceEntity?
+
+    @Query("SELECT * FROM attendance WHERE remoteId = :remoteId LIMIT 1")
+    suspend fun findByRemoteId(remoteId: String): AttendanceEntity?
+
+    @Query("SELECT * FROM attendance")
+    suspend fun getAllForSync(): List<AttendanceEntity>
+
+    @Query("UPDATE attendance SET remoteId = :remoteId WHERE id = :attendanceId")
+    suspend fun setRemoteId(attendanceId: Long, remoteId: String)
 }
