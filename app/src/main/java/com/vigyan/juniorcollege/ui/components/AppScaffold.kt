@@ -28,6 +28,7 @@ val drawerItems = listOf(
     DrawerItem("Master Settings", Routes.MASTER_SETTINGS, Icons.Default.Settings),
     DrawerItem("Database & Backup", Routes.BACKUP, Icons.Default.Backup),
     DrawerItem("Change Password", Routes.CHANGE_PASSWORD, Icons.Default.Lock),
+    DrawerItem("Cloud Sync", Routes.CLOUD_SYNC, Icons.Default.Sync),
 )
 
 @OptIn(ExperimentalMaterial3Api::class)
