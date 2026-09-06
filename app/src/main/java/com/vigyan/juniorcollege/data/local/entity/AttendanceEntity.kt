@@ -27,5 +27,8 @@ data class AttendanceEntity(
     val classId: Long? = null,
     val batchId: Long? = null,
     val markedByUserId: Long? = null,
-    val markedAt: Long = System.currentTimeMillis()
+    val markedAt: Long = System.currentTimeMillis(),
+
+    // Cloud sync tracking (Supabase row UUID once this record has been synced at least once)
+    val remoteId: String? = null
 )
