@@ -57,9 +57,6 @@ class SyncRepository(
                 persistRemoteId = { id, remoteId -> masterDao.upsertCourse(masterDao.observeCourses().first().first { it.id == id }.copy(remoteId = remoteId)) },
                 insertLocalFromRemote = { name, remoteId -> masterDao.upsertCourse(CourseEntity(name = name, remoteId = remoteId)) }
             )
-            // Re-read after the call above so any course just pulled down from a
-            // different device (not only ones pushed from this device) is included
-            // before streams try to resolve their parent course.
             val freshCourseMaps = buildMaps { masterDao.observeCourses().first().map { it.id to it.remoteId } }
             syncStreams(freshCourseMaps)
             syncSimpleCategory(
@@ -107,7 +104,7 @@ class SyncRepository(
         }
     }
 
-    private fun buildMaps(localIdToRemoteId: () -> List<Pair<Long, String?>>): SyncMaps {
+    private suspend fun buildMaps(localIdToRemoteId: suspend () -> List<Pair<Long, String?>>): SyncMaps {
         val pairs = localIdToRemoteId().filter { it.second != null }
         val l2r = pairs.associate { it.first to it.second!! }
         val r2l = pairs.associate { it.second!! to it.first }
@@ -299,13 +296,12 @@ class SyncRepository(
         val localStudents = studentDao.getAllForSync()
         val localByAdmissionNo = localStudents.associateBy { it.admissionNo.trim().lowercase() }
 
-        // Push local-only or locally-newer students
         for (s in localStudents) {
             val key = s.admissionNo.trim().lowercase()
             val remote = remoteByAdmissionNo[key]
 
             if (remote != null && remote.optLong("updated_at", 0) > s.updatedAt) {
-                continue // remote is newer, handled in the pull pass below
+                continue
             }
 
             var photoUrl = s.photoUri
@@ -352,7 +348,6 @@ class SyncRepository(
             count++
         }
 
-        // Pull remote-only or remotely-newer students
         for (i in 0 until remoteRows.length()) {
             val remote = remoteRows.getJSONObject(i)
             val admissionNo = remote.getString("admission_no")
