@@ -38,7 +38,7 @@ class CsvImportViewModel(private val repository: CsvRepository) : ViewModel() {
     val summary: StateFlow<CsvImportSummary?> = _summary
 
     fun downloadTemplate(uri: Uri) {
-        repository.writeTemplate(uri)
+        viewModelScope.launch { repository.writeTemplate(uri) }
     }
 
     fun importFile(uri: Uri, fileName: String) {
@@ -84,7 +84,10 @@ fun CsvImportScreen(navController: NavController, userName: String, onLogout: ()
             Text("Bulk Student Import", style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold)
             Spacer(Modifier.height(8.dp))
             Text(
-                "Download the CSV template, fill in student details, then import it back. Duplicate admission numbers and rows missing required fields will be reported and skipped.",
+                "Download the CSV template, fill in student details, then import it back. The template's sample row " +
+                    "uses your actual Master Settings values (Academic Year, Course, Stream, Class, Batch, Section) — " +
+                    "delete that row before adding real students, and make sure each of those six columns matches an " +
+                    "exact name from Master Settings, or the row will be skipped with an error below.",
                 style = MaterialTheme.typography.bodyMedium
             )
 
