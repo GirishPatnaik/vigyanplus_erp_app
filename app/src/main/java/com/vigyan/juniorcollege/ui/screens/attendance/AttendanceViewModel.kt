@@ -19,6 +19,9 @@ data class AttendanceUiState(
     val classId: Long? = null,
     val batchId: Long? = null,
     val sectionId: Long? = null,
+    val streamId: Long? = null,
+    // Present unless explicitly marked otherwise — students only need to be
+    // tapped when they're ABSENT, matching how attendance is actually taken.
     val markedStatus: Map<Long, AttendanceStatus> = emptyMap(),
     val isSaving: Boolean = false,
     val saved: Boolean = false
@@ -34,19 +37,39 @@ class AttendanceViewModel(
     val classes = masterRepository.classes().stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
     val batches = masterRepository.batches().stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
     val sections = masterRepository.sections().stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
+    val streams = masterRepository.allStreams().stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
 
     private val _state = MutableStateFlow(AttendanceUiState())
     val state: StateFlow<AttendanceUiState> = _state
 
     val filteredStudents: StateFlow<List<StudentEntity>> = _state
         .flatMapLatest { s ->
-            studentRepository.filter(s.classId, s.batchId, s.sectionId, "ACTIVE")
+            studentRepository.filter(s.classId, s.batchId, s.sectionId, s.streamId, "ACTIVE")
         }
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
+
+    init {
+        // Whenever the filtered roster changes (new class/batch/section/stream
+        // picked, or the screen first loads a list), default every student who
+        // doesn't already have an explicit mark to PRESENT. Existing marks the
+        // user already made are preserved — this only fills in the gaps.
+        viewModelScope.launch {
+            filteredStudents.collect { students ->
+                val current = _state.value.markedStatus
+                val defaults = students
+                    .filter { it.id !in current }
+                    .associate { it.id to AttendanceStatus.PRESENT }
+                if (defaults.isNotEmpty()) {
+                    _state.value = _state.value.copy(markedStatus = current + defaults)
+                }
+            }
+        }
+    }
 
     fun setClass(id: Long?) { _state.value = _state.value.copy(classId = id) }
     fun setBatch(id: Long?) { _state.value = _state.value.copy(batchId = id) }
     fun setSection(id: Long?) { _state.value = _state.value.copy(sectionId = id) }
+    fun setStream(id: Long?) { _state.value = _state.value.copy(streamId = id) }
 
     fun mark(studentId: Long, status: AttendanceStatus) {
         _state.value = _state.value.copy(markedStatus = _state.value.markedStatus + (studentId to status))
