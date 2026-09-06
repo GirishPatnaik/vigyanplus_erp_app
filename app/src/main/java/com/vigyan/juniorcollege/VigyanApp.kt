@@ -28,6 +28,9 @@ class VigyanApp : Application() {
         CsvRepository(this, database.studentDao(), database.masterDao(), database.importHistoryDao())
     }
     val backupRepository: BackupRepository by lazy { BackupRepository(this) }
+    val syncRepository: SyncRepository by lazy {
+        SyncRepository(this, database.studentDao(), database.attendanceDao(), database.masterDao())
+    }
 
     override fun onCreate() {
         super.onCreate()
