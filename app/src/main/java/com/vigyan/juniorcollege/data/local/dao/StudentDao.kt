@@ -101,6 +101,21 @@ interface StudentDao {
 
     @Query("SELECT rollNo FROM students WHERE rollNo = :rollNo AND classId = :classId LIMIT 1")
     suspend fun findRollNoInClass(rollNo: String, classId: Long?): String?
+
+    // --- Cloud sync support ---
+
+    @Query("SELECT * FROM students WHERE admissionNo = :admissionNo LIMIT 1")
+    suspend fun findByAdmissionNo(admissionNo: String): StudentEntity?
+
+    @Query("SELECT * FROM students WHERE remoteId = :remoteId LIMIT 1")
+    suspend fun findByRemoteId(remoteId: String): StudentEntity?
+
+    /** All students regardless of isDeleted — sync needs to push/pull deletions too. */
+    @Query("SELECT * FROM students")
+    suspend fun getAllForSync(): List<StudentEntity>
+
+    @Query("UPDATE students SET remoteId = :remoteId WHERE id = :studentId")
+    suspend fun setRemoteId(studentId: Long, remoteId: String)
 }
 
 data class GroupCount(val groupId: Long?, val total: Int)
