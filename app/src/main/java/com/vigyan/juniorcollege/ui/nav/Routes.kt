@@ -3,7 +3,8 @@ package com.vigyan.juniorcollege.ui.nav
 object Routes {
     const val LOGIN = "login"
     const val DASHBOARD = "dashboard"
-    const val STUDENT_LIST = "student_list"
+    const val STUDENT_LIST = "student_list?filter={filter}"
+    const val STUDENT_LIST_BASE = "student_list"
     const val STUDENT_ADD = "student_add"
     const val STUDENT_EDIT = "student_edit/{studentId}"
     const val STUDENT_PROFILE = "student_profile/{studentId}"
@@ -19,4 +20,6 @@ object Routes {
     fun studentEdit(id: Long) = "student_edit/$id"
     fun studentProfile(id: Long) = "student_profile/$id"
     fun attendanceHistory(id: Long) = "attendance_history/$id"
+    // filter: "all" | "active" | "inactive" | "boys" | "girls"
+    fun studentList(filter: String = "all") = "student_list?filter=$filter"
 }
