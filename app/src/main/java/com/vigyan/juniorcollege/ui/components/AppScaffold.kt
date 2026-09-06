@@ -20,7 +20,7 @@ data class DrawerItem(val label: String, val route: String, val icon: androidx.c
 
 val drawerItems = listOf(
     DrawerItem("Dashboard", Routes.DASHBOARD, Icons.Default.Home),
-    DrawerItem("Student Management", Routes.STUDENT_LIST, Icons.Default.Group),
+    DrawerItem("Student Management", Routes.studentList(), Icons.Default.Group),
     DrawerItem("Attendance", Routes.ATTENDANCE_MARK, Icons.Default.EventAvailable),
     DrawerItem("CSV Import", Routes.CSV_IMPORT, Icons.Default.UploadFile),
     DrawerItem("Reports", Routes.REPORTS, Icons.Default.BarChart),
@@ -70,10 +70,10 @@ fun AppScaffold(
                     NavigationDrawerItem(
                         icon = { Icon(item.icon, contentDescription = item.label) },
                         label = { Text(item.label) },
-                        selected = currentRoute == item.route,
+                        selected = currentRoute.substringBefore("?") == item.route.substringBefore("?"),
                         onClick = {
                             scope.launch { drawerState.close() }
-                            if (currentRoute != item.route) {
+                            if (currentRoute.substringBefore("?") != item.route.substringBefore("?")) {
                                 navController.navigate(item.route) {
                                     popUpTo(Routes.DASHBOARD) { inclusive = false }
                                     launchSingleTop = true
