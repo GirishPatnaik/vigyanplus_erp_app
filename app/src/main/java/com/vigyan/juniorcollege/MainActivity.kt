@@ -29,6 +29,7 @@ import com.vigyan.juniorcollege.ui.screens.students.RecycleBinScreen
 import com.vigyan.juniorcollege.ui.screens.students.StudentAddEditScreen
 import com.vigyan.juniorcollege.ui.screens.students.StudentListScreen
 import com.vigyan.juniorcollege.ui.screens.students.StudentProfileScreen
+import com.vigyan.juniorcollege.ui.screens.sync.SyncScreen
 import com.vigyan.juniorcollege.ui.theme.VigyanErpTheme
 import kotlinx.coroutines.launch
 
@@ -133,6 +134,9 @@ private fun VigyanAppRoot() {
         }
         composable(Routes.CHANGE_PASSWORD) {
             ChangePasswordScreen(navController, userId)
+        }
+        composable(Routes.CLOUD_SYNC) {
+            SyncScreen(navController, userName, onLogout = { logout() })
         }
     }
 }
