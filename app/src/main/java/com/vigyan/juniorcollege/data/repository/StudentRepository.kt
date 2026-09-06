@@ -11,8 +11,11 @@ class StudentRepository(private val studentDao: StudentDao) {
     fun observeById(id: Long): Flow<StudentEntity?> = studentDao.observeById(id)
     fun search(query: String): Flow<List<StudentEntity>> = studentDao.search(query)
 
-    fun filter(classId: Long?, batchId: Long?, sectionId: Long?, status: String?) =
-        studentDao.filter(classId, batchId, sectionId, status)
+    fun filter(classId: Long?, batchId: Long?, sectionId: Long?, streamId: Long?, status: String?) =
+        studentDao.filter(classId, batchId, sectionId, streamId, status)
+
+    fun filterForList(status: String?, gender: String?): Flow<List<StudentEntity>> =
+        studentDao.filterForList(status, gender)
 
     fun totalCount(): Flow<Int> = studentDao.observeTotalCount()
     fun activeCount(): Flow<Int> = studentDao.observeActiveCount()
