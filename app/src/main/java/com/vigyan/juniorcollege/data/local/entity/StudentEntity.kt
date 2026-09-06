@@ -49,5 +49,8 @@ data class StudentEntity(
 
     val createdAt: Long = System.currentTimeMillis(),
     val updatedAt: Long = System.currentTimeMillis(),
-    val isDeleted: Boolean = false      // recycle bin flag
+    val isDeleted: Boolean = false,     // recycle bin flag
+
+    // Cloud sync tracking (Supabase row UUID once this student has been synced at least once)
+    val remoteId: String? = null
 )
