@@ -89,8 +89,12 @@ private fun VigyanAppRoot() {
         composable(Routes.DASHBOARD) {
             DashboardScreen(navController, userName, onLogout = { logout() })
         }
-        composable(Routes.STUDENT_LIST) {
-            StudentListScreen(navController, userName, onLogout = { logout() })
+        composable(
+            Routes.STUDENT_LIST,
+            arguments = listOf(navArgument("filter") { type = NavType.StringType; defaultValue = "all" })
+        ) { backStackEntry ->
+            val filter = backStackEntry.arguments?.getString("filter") ?: "all"
+            StudentListScreen(navController, userName, filter = filter, onLogout = { logout() })
         }
         composable(Routes.STUDENT_ADD) {
             StudentAddEditScreen(navController, studentId = null)
