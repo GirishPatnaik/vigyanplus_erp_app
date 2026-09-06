@@ -27,18 +27,18 @@ import com.vigyan.juniorcollege.ui.theme.VigyanOrange
 import com.vigyan.juniorcollege.util.simpleFactory
 
 @Composable
-fun StudentListScreen(navController: NavController, userName: String, onLogout: () -> Unit) {
+fun StudentListScreen(navController: NavController, userName: String, filter: String = "all", onLogout: () -> Unit) {
     val context = LocalContext.current
     val app = context.applicationContext as VigyanApp
     val viewModel: StudentListViewModel = viewModel(
-        factory = simpleFactory { StudentListViewModel(app.studentRepository) }
+        factory = simpleFactory { StudentListViewModel(app.studentRepository, filter) }
     )
     val students by viewModel.students.collectAsState()
     val query by viewModel.queryState.collectAsState()
 
     AppScaffold(
         navController = navController,
-        title = "Student Management",
+        title = viewModel.filterLabel,
         currentRoute = Routes.STUDENT_LIST,
         userName = userName,
         onLogout = onLogout,
