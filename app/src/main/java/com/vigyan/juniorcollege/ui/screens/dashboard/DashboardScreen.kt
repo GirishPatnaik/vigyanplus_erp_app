@@ -12,6 +12,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
@@ -49,6 +50,11 @@ fun DashboardScreen(navController: NavController, userName: String, onLogout: ()
                 .padding(16.dp)
         ) {
             Text("Student Overview", style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold)
+            Text(
+                "Tap any card to see that list",
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.outline
+            )
             Spacer(Modifier.height(12.dp))
 
             LazyVerticalGrid(
@@ -59,14 +65,14 @@ fun DashboardScreen(navController: NavController, userName: String, onLogout: ()
             ) {
                 items(
                     listOf(
-                        Triple("Total Students", state.totalStudents.toString(), Icons.Default.Groups) to VigyanGreen,
-                        Triple("Active Students", state.activeStudents.toString(), Icons.Default.CheckCircle) to VigyanCyan,
-                        Triple("Inactive Students", state.inactiveStudents.toString(), Icons.Default.Cancel) to VigyanOrange,
-                        Triple("Boys", state.boys.toString(), Icons.Default.Boy) to VigyanCyan,
-                        Triple("Girls", state.girls.toString(), Icons.Default.Girl) to VigyanMagenta,
+                        StatCardSpec("Total Students", state.totalStudents.toString(), Icons.Default.Groups, VigyanGreen, "all"),
+                        StatCardSpec("Active Students", state.activeStudents.toString(), Icons.Default.CheckCircle, VigyanCyan, "active"),
+                        StatCardSpec("Inactive Students", state.inactiveStudents.toString(), Icons.Default.Cancel, VigyanOrange, "inactive"),
+                        StatCardSpec("Boys", state.boys.toString(), Icons.Default.Boy, VigyanCyan, "boys"),
+                        StatCardSpec("Girls", state.girls.toString(), Icons.Default.Girl, VigyanMagenta, "girls"),
                     )
-                ) { (triple, color) ->
-                    StatCard(title = triple.first, value = triple.second, icon = triple.third, color = color)
+                ) { spec ->
+                    StatCard(spec) { navController.navigate(Routes.studentList(spec.filter)) }
                 }
             }
 
@@ -90,44 +96,45 @@ fun DashboardScreen(navController: NavController, userName: String, onLogout: ()
 
             Spacer(Modifier.height(24.dp))
             Text("Quick Actions", style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold)
-            Spacer(Modifier.height(12.dp))
+            Spacer(Modifier.height(8.dp))
 
-            LazyVerticalGrid(
-                columns = GridCells.Fixed(2),
-                modifier = Modifier.height(220.dp),
-                horizontalArrangement = Arrangement.spacedBy(12.dp),
-                verticalArrangement = Arrangement.spacedBy(12.dp)
-            ) {
-                items(
-                    listOf(
-                        Triple("Add Student", Icons.Default.PersonAdd, Routes.STUDENT_ADD),
-                        Triple("Import CSV", Icons.Default.UploadFile, Routes.CSV_IMPORT),
-                        Triple("Search Student", Icons.Default.Search, Routes.STUDENT_LIST),
-                        Triple("Take Attendance", Icons.Default.EventAvailable, Routes.ATTENDANCE_MARK),
-                        Triple("Reports", Icons.Default.BarChart, Routes.REPORTS),
-                    )
-                ) { (label, icon, route) ->
-                    QuickActionCard(label, icon) { navController.navigate(route) }
-                }
-            }
+            QuickActionTabs(
+                actions = listOf(
+                    Triple("Add Student", Icons.Default.PersonAdd, Routes.STUDENT_ADD),
+                    Triple("Import CSV", Icons.Default.UploadFile, Routes.CSV_IMPORT),
+                    Triple("Search", Icons.Default.Search, Routes.studentList()),
+                    Triple("Attendance", Icons.Default.EventAvailable, Routes.ATTENDANCE_MARK),
+                    Triple("Reports", Icons.Default.BarChart, Routes.REPORTS),
+                ),
+                onSelect = { route -> navController.navigate(route) }
+            )
+            Spacer(Modifier.height(16.dp))
         }
     }
 }
 
+private data class StatCardSpec(
+    val title: String,
+    val value: String,
+    val icon: ImageVector,
+    val color: Color,
+    val filter: String
+)
+
 @Composable
-private fun StatCard(title: String, value: String, icon: ImageVector, color: Color) {
-    Card(modifier = Modifier.fillMaxWidth()) {
+private fun StatCard(spec: StatCardSpec, onClick: () -> Unit) {
+    Card(onClick = onClick, modifier = Modifier.fillMaxWidth()) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(16.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Icon(icon, contentDescription = title, tint = color, modifier = Modifier.size(32.dp))
+            Icon(spec.icon, contentDescription = spec.title, tint = spec.color, modifier = Modifier.size(32.dp))
             Spacer(Modifier.width(12.dp))
             Column {
-                Text(value, style = MaterialTheme.typography.headlineMedium, fontWeight = FontWeight.Bold)
-                Text(title, style = MaterialTheme.typography.bodySmall)
+                Text(spec.value, style = MaterialTheme.typography.headlineMedium, fontWeight = FontWeight.Bold)
+                Text(spec.title, style = MaterialTheme.typography.bodySmall)
             }
         }
     }
@@ -141,21 +148,27 @@ private fun AttendanceMiniStat(label: String, value: String, color: Color = Mate
     }
 }
 
+/**
+ * Quick Actions rendered as a horizontally scrollable tab strip rather than a
+ * card grid. These are one-shot navigation shortcuts, not persistent content
+ * tabs — tapping one navigates immediately, so the "selected" tab is only
+ * ever cosmetic (always resets to the first).
+ */
 @Composable
-private fun QuickActionCard(label: String, icon: ImageVector, onClick: () -> Unit) {
-    ElevatedCard(
-        onClick = onClick,
-        modifier = Modifier.fillMaxWidth()
+private fun QuickActionTabs(actions: List<Triple<String, ImageVector, String>>, onSelect: (String) -> Unit) {
+    ScrollableTabRow(
+        selectedTabIndex = 0,
+        edgePadding = 0.dp,
+        containerColor = MaterialTheme.colorScheme.surfaceVariant,
+        modifier = Modifier.clip(MaterialTheme.shapes.medium)
     ) {
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            Icon(icon, contentDescription = label, tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size(28.dp))
-            Spacer(Modifier.height(8.dp))
-            Text(label, style = MaterialTheme.typography.labelLarge)
+        actions.forEach { (label, icon, route) ->
+            Tab(
+                selected = false,
+                onClick = { onSelect(route) },
+                text = { Text(label) },
+                icon = { Icon(icon, contentDescription = label) }
+            )
         }
     }
 }
