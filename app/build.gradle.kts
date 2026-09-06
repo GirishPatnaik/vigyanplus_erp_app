@@ -30,7 +30,7 @@ android {
     }
 
     signingConfigs {
-        create("debug") {
+        getByName("debug") {
             storeFile = rootProject.file("config/debug.keystore")
             storePassword = "android"
             keyAlias = "androiddebugkey"
