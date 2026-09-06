@@ -49,6 +49,7 @@ interface StudentDao {
            AND (:classId IS NULL OR classId = :classId)
            AND (:batchId IS NULL OR batchId = :batchId)
            AND (:sectionId IS NULL OR sectionId = :sectionId)
+           AND (:streamId IS NULL OR streamId = :streamId)
            AND (:status IS NULL OR status = :status)
            ORDER BY studentName"""
     )
@@ -56,8 +57,17 @@ interface StudentDao {
         classId: Long?,
         batchId: Long?,
         sectionId: Long?,
+        streamId: Long?,
         status: String?
     ): Flow<List<StudentEntity>>
+
+    @Query(
+        """SELECT * FROM students WHERE isDeleted = 0
+           AND (:status IS NULL OR status = :status)
+           AND (:gender IS NULL OR gender = :gender)
+           ORDER BY studentName"""
+    )
+    fun filterForList(status: String?, gender: String?): Flow<List<StudentEntity>>
 
     @Query("SELECT COUNT(*) FROM students WHERE isDeleted = 0")
     fun observeTotalCount(): Flow<Int>
