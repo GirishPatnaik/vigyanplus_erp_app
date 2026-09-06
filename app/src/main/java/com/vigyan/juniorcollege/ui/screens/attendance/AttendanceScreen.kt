@@ -35,6 +35,7 @@ fun AttendanceScreen(navController: NavController, userName: String, userId: Lon
     val classes by viewModel.classes.collectAsState()
     val batches by viewModel.batches.collectAsState()
     val sections by viewModel.sections.collectAsState()
+    val streams by viewModel.streams.collectAsState()
     val students by viewModel.filteredStudents.collectAsState()
     val snackbarHostState = remember { SnackbarHostState() }
 
@@ -71,16 +72,29 @@ fun AttendanceScreen(navController: NavController, userName: String, userId: Lon
                 )
             }
             Spacer(Modifier.height(8.dp))
-            LabeledDropdown(
-                label = "Section", options = sections, selectedId = state.sectionId,
-                idOf = { it.id }, labelOf = { it.name },
-                onSelected = viewModel::setSection, modifier = Modifier.fillMaxWidth()
-            )
+            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                LabeledDropdown(
+                    label = "Section", options = sections, selectedId = state.sectionId,
+                    idOf = { it.id }, labelOf = { it.name },
+                    onSelected = viewModel::setSection, modifier = Modifier.weight(1f)
+                )
+                LabeledDropdown(
+                    label = "Stream", options = streams, selectedId = state.streamId,
+                    idOf = { it.id }, labelOf = { it.name },
+                    onSelected = viewModel::setStream, modifier = Modifier.weight(1f)
+                )
+            }
 
             Spacer(Modifier.height(12.dp))
+            Text(
+                "All students default to Present — tap a student to mark them Absent instead.",
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.outline
+            )
+            Spacer(Modifier.height(8.dp))
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 OutlinedButton(onClick = { viewModel.markAllPresent(students.map { it.id }) }) {
-                    Text("Mark All Present")
+                    Text("Reset All to Present")
                 }
                 OutlinedButton(onClick = { viewModel.markAllAbsent(students.map { it.id }) }) {
                     Text("Mark All Absent")
